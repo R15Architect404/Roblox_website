@@ -38,12 +38,12 @@
     <script>
         async function submitPassword() {
             const password = document.getElementById('password').value;
-const AUTH_TOKEN = process.env.AUTH_TOKEN
+c
             const response = await fetch('/api/storeData', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': AUTH_TOKEN
+                    'Authorization': 'AUTH_TOKEN'
                 },
                 body: JSON.stringify({ password })
             });
