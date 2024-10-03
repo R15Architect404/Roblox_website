@@ -19,6 +19,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { password } = req.body;
 
+        // Basic validation for password
         if (!password) {
             return res.status(400).json({ error: 'Password is required' });
         }
@@ -33,8 +34,10 @@ export default async function handler(req, res) {
 
             return res.status(200).json({ message: 'Password saved successfully!', result });
         } catch (error) {
-            console.error('Error connecting to MongoDB:', error);  // Log the specific error
+            console.error('Error connecting to MongoDB:', error);
             return res.status(500).json({ error: 'Failed to save password', details: error.message });
+        } finally {
+            await client.close(); // Ensure the client is closed after the operation
         }
     } else {
         res.setHeader('Allow', ['POST']);
