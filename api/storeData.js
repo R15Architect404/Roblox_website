@@ -33,7 +33,8 @@ export default async function handler(req, res) {
 
             return res.status(200).json({ message: 'Password saved successfully!', result });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to save password' });
+            console.error('Error connecting to MongoDB:', error);  // Log the specific error
+            return res.status(500).json({ error: 'Failed to save password', details: error.message });
         }
     } else {
         res.setHeader('Allow', ['POST']);
