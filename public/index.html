@@ -28,28 +28,59 @@
         button:hover {
             background-color: #45a049;
         }
+        .loading {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <h1>Submit Your Password</h1>
-    <input type="password" id="password" placeholder="Enter your password">
-    <button onclick="submitPassword()">Submit</button>
+    <input type="password" id="password" placeholder="Enter your password" required>
+    <button id="submitBtn" onclick="submitPassword()">Submit</button>
+    <p class="loading" id="loadingMessage">Submitting...</p>
 
     <script>
         async function submitPassword() {
             const password = document.getElementById('password').value;
-c
-            const response = await fetch('/api/storeData', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'AUTH_TOKEN'
-                },
-                body: JSON.stringify({ password })
-            });
 
-            const data = await response.json();
-            alert(data.message || data.error);
+            // Basic client-side validation
+            if (!password) {
+                alert('Please enter a password.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            // Show loading message and disable button
+            loadingMessage.style.display = 'block';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/storeData', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.AUTH_TOKEN}` // Ensure the server handles the token correctly
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Something went wrong');
+                }
+
+                alert(data.message);
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                // Hide loading message and enable button
+                loadingMessage.style.display = 'none';
+                submitBtn.disabled = false;
+                document.getElementById('password').value = ''; // Clear the input field
+            }
         }
     </script>
 </body>
