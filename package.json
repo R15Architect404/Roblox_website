@@ -1,0 +1,12 @@
+{
+  "name": "roblox-datastore",
+  "version": "1.0.0",
+  "description": "A Roblox datastore API hosted on Vercel",
+  "main": "index.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "mongodb": "^4.4.0"
+  }
+}
