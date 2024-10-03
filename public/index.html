@@ -61,7 +61,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.AUTH_TOKEN}` // Ensure the server handles the token correctly
+                        // Do NOT send the auth token from the client side
                     },
                     body: JSON.stringify({ password })
                 });
