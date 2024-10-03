@@ -1,34 +1,42 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI; // Store this in your Vercel environment variables
+const uri = process.env.MONGODB_URI;
 let client;
 
 if (!client) {
-  client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 }
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { password } = req.body;
+    const AUTH_TOKEN = process.env.AUTH_TOKEN;
 
-    if (!password) {
-      return res.status(400).json({ error: 'Password is required' });
+    // Check token
+    const token = req.headers.authorization;
+    if (token !== `Bearer ${AUTH_TOKEN}`) {
+        return res.status(403).json({ error: 'Invalid Token' });
     }
 
-    try {
-      await client.connect();
-      const database = client.db('robloxDataStore');
-      const collection = database.collection('passwords');
+    if (req.method === 'POST') {
+        const { password } = req.body;
 
-      // Insert the password into the collection
-      const result = await collection.insertOne({ password });
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
+        }
 
-      return res.status(200).json({ message: 'Password saved successfully!', result });
-    } catch (error) {
-      return res.status(500).json({ error: 'Failed to save password' });
+        try {
+            await client.connect();
+            const database = client.db('robloxDataStore');
+            const collection = database.collection('passwords');
+
+            // Insert the password into the collection
+            const result = await collection.insertOne({ password, timestamp: new Date() });
+
+            return res.status(200).json({ message: 'Password saved successfully!', result });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to save password' });
+        }
+    } else {
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
 }
